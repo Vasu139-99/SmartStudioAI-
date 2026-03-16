@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — SmartStudio AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        :root {
+            --card-bg: rgba(30, 32, 50, 0.45);
+            --border: rgba(255, 255, 255, 0.08);
+            --danger: #ff4757;
+            --success: #2ed573;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .stat-info h3 {
+            font-size: 0.9rem;
+            opacity: 0.6;
+            margin-bottom: 5px;
+        }
+
+        .stat-info p {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .table-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-header h2 {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        th {
+            opacity: 0.6;
+            font-weight: 500;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge.admin {
+            background: rgba(108, 92, 231, 0.15);
+            color: #a29bfe;
+            border: 1px solid rgba(108, 92, 231, 0.3);
+        }
+
+        .badge.user {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ccc;
+        }
+
+        .action-btn {
+            background: rgba(255, 71, 87, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(255, 71, 87, 0.2);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--gradient-btn);
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <!-- ═══ Nav ═══ -->
+    <nav class="user-nav">
+        <div class="nav-left">
+            <a href="/" class="brand-capsule">
+                <span class="nav-brand">Admin <span class="highlight">Panel</span></span>
+            </a>
+        </div>
+        <div class="nav-right">
+            <a href="/" class="nav-btn logout-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">← Back to App</a>
+        </div>
+    </nav>
+
+    <!-- ═══ Main Container ═══ -->
+    <div class="container" style="padding-top: 100px;">
+
+        <!-- ═══ Stat Grid ═══ -->
+        <div class="admin-grid">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-info">
+                    <h3>Total Users</h3>
+                    <p id="totalUsers">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎬</div>
+                <div class="stat-info">
+                    <h3>Total Projects</h3>
+                    <p id="totalProjects">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-info">
+                    <h3>Pending Users</h3>
+                    <p id="totalPending">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ Tab Bar ═══ -->
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button class="tab-btn active" onclick="switchTab('users')">Users</button>
+            <button class="tab-btn" onclick="switchTab('pending')">Pending (Unverified)</button>
+            <button class="tab-btn" onclick="switchTab('projects')">All Projects</button>
+        </div>
+
+        <!-- ═══ Users Table ═══ -->
+        <section id="usersSection" class="table-section">
+            <div class="table-header">
+                <h2>📊 User Management</h2>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Created At</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr><td colspan="6" style="text-align:center;">Loading users...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ═══ Projects Table ═══ -->
+        <section id="projectsSection" class="table-section" style="display: none;">
+            <!-- ... table header and body ... -->
+            <div class="table-header">
+                <h2>🎥 Video Projects</h2>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User ID</th>
+                            <th>Product Name</th>
+                            <th>Language</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody id="projectsTableBody">
+                        <tr><td colspan="6" style="text-align:center;">Loading projects...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ═══ Pending Table ═══ -->
+        <section id="pendingSection" class="table-section" style="display: none;">
+            <div class="table-header">
+                <h2>⏳ Pending Activations</h2>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Expires At</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendingTableBody">
+                        <tr><td colspan="3" style="text-align:center;">Loading pending...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ═══ Scripts ═══ -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            loadStats();
+            loadUsers();
+            loadPending();
+            loadProjects();
+        });
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.getElementById('usersSection').style.display = 'none';
+            document.getElementById('projectsSection').style.display = 'none';
+            document.getElementById('pendingSection').style.display = 'none';
+
+            if (tab === 'users') {
+                document.getElementById('usersSection').style.display = 'block';
+            } else if (tab === 'projects') {
+                document.getElementById('projectsSection').style.display = 'block';
+            } else if (tab === 'pending') {
+                document.getElementById('pendingSection').style.display = 'block';
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/admin/stats');
+                const data = await res.json();
+                if (data.total_users !== undefined) {
+                    document.getElementById('totalUsers').innerText = data.total_users;
+                    document.getElementById('totalProjects').innerText = data.total_projects;
+                    if(document.getElementById('totalPending')) {
+                        document.getElementById('totalPending').innerText = data.total_pending || 0;
+                    }
+                }
+            } catch (err) { console.error("Stats Error:", err); }
+        }
+
+        async function loadUsers() {
+            try {
+                const res = await fetch('/api/admin/users');
+                const data = await res.json();
+                const tbody = document.getElementById('usersTableBody');
+                tbody.innerHTML = '';
+
+                if (data.users && data.users.length > 0) {
+                    data.users.forEach(u => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${u.id}</td>
+                            <td><strong>${u.username}</strong></td>
+                            <td>${u.email}</td>
+                            <td><span class="badge ${u.is_admin ? 'admin' : 'user'}">${u.is_admin ? 'Admin' : 'User'}</span></td>
+                            <td>${new Date(u.created_at).toLocaleDateString()}</td>
+                            <td>
+                                ${u.is_admin ? '' : `<button class="action-btn" onclick="deleteUser(${u.id})">Delete</button>`}
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No users found.</td></tr>';
+                }
+            } catch (err) { console.error("Users Error:", err); }
+        }
+
+        async function loadProjects() {
+             // ... code for projects ...
+             try {
+                const res = await fetch('/api/admin/projects');
+                const data = await res.json();
+                const tbody = document.getElementById('projectsTableBody');
+                tbody.innerHTML = '';
+
+                if (data.projects && data.projects.length > 0) {
+                    data.projects.forEach(p => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><code>${p.id}</code></td>
+                            <td>${p.user_id || 'Anon'}</td>
+                            <td>${p.product_name || 'Unnamed'}</td>
+                            <td>${p.language || 'English'}</td>
+                            <td><span class="badge" style="background: rgba(255,255,255,0.05);">${p.status}</span></td>
+                            <td>${new Date(p.created_at).toLocaleDateString()}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No projects found.</td></tr>';
+                }
+            } catch (err) { console.error("Projects Error:", err); }
+        }
+
+        async function loadPending() {
+            try {
+                const res = await fetch('/api/admin/pending');
+                const data = await res.json();
+                const tbody = document.getElementById('pendingTableBody');
+                tbody.innerHTML = '';
+
+                if (data.pending && data.pending.length > 0) {
+                    data.pending.forEach(p => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><strong>${p.username}</strong></td>
+                            <td>${p.email}</td>
+                            <td>${p.expires_at ? new Date(p.expires_at).toLocaleString() : 'N/A'}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No pending users found.</td></tr>';
+                }
+            } catch (err) { console.error("Pending Error:", err); }
+        }
+
+        async function deleteUser(id) {
+            if (!confirm("Are you sure you want to delete this user and ALL their projects? This cannot be undone.")) return;
+
+            try {
+                const res = await fetch(`/api/admin/user/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.message) {
+                    alert(data.message);
+                    loadUsers(); // reload
+                    loadStats(); // reload counts
+                } else {
+                    alert(data.error || "Delete failed");
+                }
+            } catch (err) { alert("Error deleting user"); }
+        }
+    </script>
+
+</body>
+
+</html>

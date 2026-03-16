@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.pytest_cache/
+
+# Environments
+.env
+
+# Flask
+instance/
+
+# VS Code
+.vscode/
+
+# Project Specific
+backend/temp/*
+!backend/temp/.gitkeep
+backend/static/uploads/*
+!backend/static/uploads/.gitkeep
+backend/static/output/*
+!backend/static/output/.gitkeep

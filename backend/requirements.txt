@@ -1,0 +1,14 @@
+flask
+requests
+moviepy==1.0.3
+google-genai
+python-dotenv
+openai-whisper
+Pillow
+pysrt
+pydub
+gTTS
+imageio-ffmpeg
+deep-translator
+pymysql
+gunicorn

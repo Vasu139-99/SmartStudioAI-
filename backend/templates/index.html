@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartStudio AI — AI Video Generator</title>
+    <meta name="description" content="Upload 4 images and let AI create a stunning 3D cinematic video with voiceover">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <!-- ═══ Animated Background ═══ -->
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- ═══ User Nav Bar ═══ -->
+    <nav class="user-nav" id="userNav">
+        <div class="nav-left">
+            <a href="/" class="brand-capsule">
+                <img src="/static/datavidwan_logo.png" class="datavidwan-logo" alt="DataVidwan">
+            </a>
+        </div>
+        <a href="/" class="nav-center">
+            <img src="/static/smartstudio_logo.png" class="logo-img" alt="SmartStudio AI">
+            <span class="nav-brand">SmartStudio <span class="highlight">AI</span></span>
+        </a>
+        <div class="nav-right">
+            {% if session.get("is_admin") %}
+            <a href="/admin" class="nav-btn admin-btn" style="background: rgba(108, 92, 231, 0.2); color: #a29bfe; border: 1px solid rgba(108, 92, 231, 0.4); text-decoration: none; display: flex; align-items: center; justify-content: center; padding: 10px 15px; border-radius: 8px;">🛠 Admin Panel</a>
+            {% endif %}
+            <span class="nav-user" id="navUsername"><span class="user-icon">👤</span> User</span>
+            <button class="nav-btn logout-btn" id="logoutBtn" title="Logout">Logout</button>
+            <button class="nav-btn delete-account-btn" id="deleteAccountBtn" title="Delete Account">🗑 Delete
+                Account</button>
+        </div>
+    </nav>
+
+    <!-- ═══ Main Container ═══ -->
+    <div class="container" style="padding-top: 80px;">
+
+        <!-- ═══ Header ═══ -->
+        <header class="header">
+            <p class="tagline">Upload 4 images → AI creates a cinematic 3D video with voiceover</p>
+        </header>
+
+        <!-- ═══ Upload Section ═══ -->
+        <section id="uploadSection" class="card glass-card">
+            <h2 class="section-title">
+                <span class="step-badge">1</span>
+                Upload Images
+            </h2>
+
+            <div class="upload-grid" id="uploadGrid">
+                <div class="upload-slot" data-index="0">
+                    <input type="file" accept="image/*" class="file-input" id="file-0">
+                    <label for="file-0" class="upload-label">
+                        <div class="upload-icon">+</div>
+                        <span>Image 1</span>
+                    </label>
+                    <img class="preview-img" alt="Preview 1">
+                    <button class="remove-btn" title="Remove">&times;</button>
+                </div>
+                <div class="upload-slot" data-index="1">
+                    <input type="file" accept="image/*" class="file-input" id="file-1">
+                    <label for="file-1" class="upload-label">
+                        <div class="upload-icon">+</div>
+                        <span>Image 2</span>
+                    </label>
+                    <img class="preview-img" alt="Preview 2">
+                    <button class="remove-btn" title="Remove">&times;</button>
+                </div>
+                <div class="upload-slot" data-index="2">
+                    <input type="file" accept="image/*" class="file-input" id="file-2">
+                    <label for="file-2" class="upload-label">
+                        <div class="upload-icon">+</div>
+                        <span>Image 3</span>
+                    </label>
+                    <img class="preview-img" alt="Preview 3">
+                    <button class="remove-btn" title="Remove">&times;</button>
+                </div>
+                <div class="upload-slot" data-index="3">
+                    <input type="file" accept="image/*" class="file-input" id="file-3">
+                    <label for="file-3" class="upload-label">
+                        <div class="upload-icon">+</div>
+                        <span>Image 4</span>
+                    </label>
+                    <img class="preview-img" alt="Preview 4">
+                    <button class="remove-btn" title="Remove">&times;</button>
+                </div>
+            </div>
+
+            <!-- Product Name -->
+            <div class="input-group">
+                <label for="productName" class="input-label">
+                    <span class="step-badge small">2</span>
+                    Product / Scene Name
+                </label>
+                <input type="text" id="productName" placeholder="e.g. Premium Wireless Headphones, Sunset Beach..."
+                    class="text-input">
+            </div>
+
+            <!-- Language Selection -->
+            <div class="input-group">
+                <label for="languageSelect" class="input-label">
+                    <span class="step-badge small">3</span>
+                    Voiceover Language
+                </label>
+                <select id="languageSelect" class="premium-select colorful-select" style="width: 100%;">
+                    <option value="English">English</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="French">French</option>
+                    <option value="German">German</option>
+                    <option value="Italian">Italian</option>
+                    <option value="Portuguese">Portuguese</option>
+                    <option value="Hindi">Hindi</option>
+                    <option value="Gujarati">Gujarati</option>
+                    <option value="Japanese">Japanese</option>
+                    <option value="Korean">Korean</option>
+                </select>
+            </div>
+
+            <!-- Aspect Ratio Selection -->
+            <div class="input-group">
+                <label for="aspectRatioSelect" class="input-label">
+                    <span class="step-badge small">4</span>
+                    Video Aspect Ratio
+                </label>
+                <select id="aspectRatioSelect" class="premium-select colorful-select" style="width: 100%;">
+                    <option value="9:16">Portrait (9:16) — Reels, TikTok, Shorts</option>
+                    <option value="16:9">Landscape (16:9) — YouTube, TV</option>
+                </select>
+            </div>
+            <!-- Custom Script Option -->
+            <div class="input-group">
+                <label for="customScriptToggle" class="input-label"
+                    style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="customScriptToggle" style="width: 18px; height: 18px; cursor: pointer;">
+                    Write my own voiceover script
+                </label>
+                <textarea id="customScriptText" class="text-input"
+                    placeholder="Type your custom voiceover script here..."
+                    style="display: none; height: 100px; margin-top: 10px; resize: vertical;"></textarea>
+            </div>
+
+            <!-- Subtitle Color Setup -->
+            <div class="input-group" style="margin-bottom: 25px;">
+                <label for="captionColor" class="input-label">
+                    <span class="step-badge small">5</span>
+                    Subtitle Color
+                </label>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <input type="color" id="captionColor" value="#ffff00"
+                        style="width: 50px; height: 40px; cursor: pointer; background: transparent; border: none; padding: 0;">
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">Pick a color for the animated
+                        subtitles</span>
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <button id="generateBtn" class="generate-btn" disabled>
+                <span class="btn-text">✦ Generate AI Video</span>
+                <span class="btn-loader" style="display:none;">
+                    <span class="spinner"></span>
+                    Processing...
+                </span>
+            </button>
+        </section>
+
+        <!-- ═══ Progress Section ═══ -->
+        <section id="progressSection" class="card glass-card" style="display:none;">
+            <h2 class="section-title">
+                <span class="step-badge pulse">⚡</span>
+                Generating Your Video
+            </h2>
+
+            <div class="progress-tracker">
+                <div class="progress-step" data-step="analyzing">
+                    <div class="step-dot"></div>
+                    <div class="step-info">
+                        <span class="step-name">Analyzing Images</span>
+                        <span class="step-desc">Gemini AI reads your images & writes script</span>
+                    </div>
+                </div>
+                <div class="progress-step" data-step="generating">
+                    <div class="step-dot"></div>
+                    <div class="step-info">
+                        <span class="step-name">Creating 3D Videos</span>
+                        <span class="step-desc">DeAPI generates cinematic clips from images</span>
+                    </div>
+                </div>
+                <div class="progress-step" data-step="merging">
+                    <div class="step-dot"></div>
+                    <div class="step-info">
+                        <span class="step-name">Merging Clips</span>
+                        <span class="step-desc">MoviePy combines all scenes together</span>
+                    </div>
+                </div>
+                <div class="progress-step" data-step="voice">
+                    <div class="step-dot"></div>
+                    <div class="step-info">
+                        <span class="step-name">Adding Voiceover</span>
+                        <span class="step-desc">AI creates premium narration</span>
+                    </div>
+                </div>
+                <div class="progress-step" data-step="done">
+                    <div class="step-dot"></div>
+                    <div class="step-info">
+                        <span class="step-name">Complete!</span>
+                        <span class="step-desc">Your video is ready</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="current-status" id="currentStatus">
+                Initializing pipeline...
+            </div>
+        </section>
+
+        <!-- ═══ Result Section ═══ -->
+        <section id="resultSection" class="card glass-card" style="display:none;">
+            <h2 class="section-title">
+                <span class="step-badge success">✓</span>
+                Your AI Video
+            </h2>
+
+            <div class="video-container" id="videoContainer">
+                <video id="videoPlayer" controls playsinline></video>
+                <div id="customCaptionsContainer" class="custom-captions-container"></div>
+            </div>
+
+            <div class="result-actions"
+                style="display: flex; flex-direction: column; gap: 15px; align-items: center; justify-content: center; margin-top: 20px;">
+                <!-- Remix Controls Area -->
+
+                <div style="display: flex; gap: 10px; align-items: center; justify-content: center; width: 100%;">
+                    <div class="input-group" style="margin: 0;">
+                        <label style="font-size: 0.85rem; margin-bottom: 5px; opacity: 0.7;">Show Captions:</label>
+                        <select id="liveCaptionSelect" class="premium-select colorful-select">
+                            <option value="Off">No Live Captions</option>
+                            <option value="English">English</option>
+                            <option value="Spanish">Spanish</option>
+                            <option value="French">French</option>
+                            <option value="German">German</option>
+                            <option value="Italian">Italian</option>
+                            <option value="Portuguese">Portuguese</option>
+                            <option value="Hindi">Hindi</option>
+                            <option value="Gujarati">Gujarati</option>
+                            <option value="Japanese">Japanese</option>
+                            <option value="Korean">Korean</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group" style="margin: 0;">
+                        <label style="font-size: 0.85rem; margin-bottom: 5px; opacity: 0.7;">Subtitle Color:</label>
+                        <input type="color" id="captionColorResult" value="#ffff00" style="height: 38px; width: 60px; cursor: pointer; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius:10px;">
+                    </div>
+
+                    <a id="downloadBtn" class="action-btn download-btn" download style="margin-top: 22px;">
+                        ↓ Download Video
+                    </a>
+                    <span id="downloadLoader" class="btn-loader"
+                        style="display:none; color: var(--accent); margin-top: 20px;">
+                        <span class="spinner"></span> Processing...
+                    </span>
+                    <button id="newVideoBtn" class="action-btn new-btn" style="margin-top: 22px;">
+                        + New Video
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ═══ Error Section ═══ -->
+        <section id="errorSection" class="card glass-card error-card" style="display:none;">
+            <h2 class="section-title">
+                <span class="step-badge error">!</span>
+                Something Went Wrong
+            </h2>
+            <p id="errorText"></p>
+            <button id="retryBtn" class="action-btn new-btn">Try Again</button>
+        </section>
+
+        <!-- ═══ Past Projects ═══ -->
+        <section id="historySection" class="card glass-card">
+            <h2 class="section-title">
+                <span class="step-badge">📁</span>
+                My Projects
+            </h2>
+            <div id="projectsList" class="projects-grid">
+                <p class="empty-state">No projects yet. Create your first one above!</p>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+
+</html>

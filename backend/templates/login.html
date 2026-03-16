@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartStudio AI — Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* ═══ Splash Screen ═══ */
+        #splash-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #0a0b14 0%, #171825 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        #splash-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .splash-logo {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            animation: logoBounce 1.5s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95);
+        }
+
+        .splash-title {
+            margin-top: 20px;
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            animation: textPulse 1s infinite alternate;
+        }
+
+        @keyframes logoBounce {
+            0% { transform: translateY(0) scale(0.95); filter: drop-shadow(0 0 10px rgba(108, 92, 231, 0.2)); }
+            100% { transform: translateY(-15px) scale(1.1); filter: drop-shadow(0 0 35px rgba(108, 92, 231, 0.8)); }
+        }
+
+        @keyframes textPulse {
+            0% { opacity: 0.6; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1.02); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ═══ Splash Screen Overlay ═══ -->
+    <div id="splash-screen">
+        <img src="/static/smartstudio_logo.png" class="splash-logo" alt="Logo">
+        <div class="splash-title">SmartStudio <span class="highlight">AI</span></div>
+    </div>
+
+    <!-- ═══ User Nav Bar ═══ -->
+    <nav class="user-nav" id="userNav">
+        <div class="nav-left">
+            <a href="/" class="brand-capsule">
+                <img src="/static/datavidwan_logo.png" class="datavidwan-logo" alt="DataVidwan">
+            </a>
+        </div>
+        <a href="/" class="nav-center">
+            <img src="/static/smartstudio_logo.png" class="logo-img" alt="SmartStudio AI">
+            <span class="nav-brand">SmartStudio <span class="highlight">AI</span></span>
+        </a>
+        <div class="nav-right">
+            <a href="/login" class="nav-btn auth-link-btn">Login</a>
+            <a href="/register" class="nav-btn auth-link-btn">Register</a>
+        </div>
+    </nav>
+
+    <!-- Animated Background -->
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="auth-container">
+
+        <!-- Login Card -->
+        <div class="card glass-card auth-card">
+            <h2 class="auth-title">Welcome Back</h2>
+            <p class="auth-subtitle">Sign in to your account</p>
+
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="you@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+
+                <div id="loginError" class="auth-error" style="display:none;"></div>
+
+                <button type="submit" class="generate-btn auth-btn" id="loginBtn">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-loader" style="display:none;">
+                        <span class="spinner"></span> Signing in...
+                    </span>
+                </button>
+            </form>
+
+            <p class="auth-link">
+                Don't have an account? <a href="/register">Create one</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // ── Splash Screen Timer (First Visit Only) ──
+        document.addEventListener('DOMContentLoaded', () => {
+            const splash = document.getElementById('splash-screen');
+            if (sessionStorage.getItem('hasSeenSplash')) {
+                if (splash) splash.remove(); // Skip instantly Node
+                return;
+            }
+
+            setTimeout(() => {
+                if (splash) {
+                    splash.classList.add('fade-out');
+                    setTimeout(() => splash.remove(), 800);
+                }
+                sessionStorage.setItem('hasSeenSplash', 'true');
+            }, 3000); // 3 Seconds
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('loginError');
+            const btnText = btn.querySelector('.btn-text');
+            const btnLoader = btn.querySelector('.btn-loader');
+
+            errorDiv.style.display = 'none';
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'inline-flex';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: document.getElementById('email').value,
+                        password: document.getElementById('password').value
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    window.location.href = '/';
+                } else {
+                    errorDiv.textContent = data.error || 'Login failed';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+
+            btnText.style.display = 'inline';
+            btnLoader.style.display = 'none';
+            btn.disabled = false;
+        });
+    </script>
+</body>
+
+</html>

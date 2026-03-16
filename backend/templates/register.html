@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartStudio AI — Register</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* ═══ Splash Screen ═══ */
+        #splash-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #0a0b14 0%, #171825 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        #splash-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .splash-logo {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            animation: logoBounce 2.5s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95);
+        }
+
+        .splash-title {
+            margin-top: 20px;
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            animation: textPulse 1s infinite alternate;
+        }
+
+        @keyframes logoBounce {
+            0% { transform: translateY(0) scale(0.95); filter: drop-shadow(0 0 10px rgba(108, 92, 231, 0.2)); }
+            100% { transform: translateY(-15px) scale(1.1); filter: drop-shadow(0 0 25px rgba(108, 92, 231, 0.8)); }
+        }
+
+        @keyframes textPulse {
+            0% { opacity: 0.6; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1.02); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ═══ Splash Screen Overlay ═══ -->
+    <div id="splash-screen">
+        <img src="/static/smartstudio_logo.png" class="splash-logo" alt="Logo">
+        <div class="splash-title">SmartStudio <span class="highlight">AI</span></div>
+    </div>
+
+    <!-- ═══ User Nav Bar ═══ -->
+    <nav class="user-nav" id="userNav">
+        <div class="nav-left">
+            <a href="/" class="brand-capsule">
+                <img src="/static/datavidwan_logo.png" class="datavidwan-logo" alt="DataVidwan">
+            </a>
+        </div>
+        <a href="/" class="nav-center">
+            <img src="/static/smartstudio_logo.png" class="logo-img" alt="SmartStudio AI">
+            <span class="nav-brand">SmartStudio <span class="highlight">AI</span></span>
+        </a>
+        <div class="nav-right">
+            <a href="/login" class="nav-btn auth-link-btn">Login</a>
+            <a href="/register" class="nav-btn auth-link-btn">Register</a>
+        </div>
+    </nav>
+
+    <!-- Animated Background -->
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="auth-container">
+
+        <!-- Register Card -->
+        <div class="card glass-card auth-card">
+            <h2 class="auth-title">Create Account</h2>
+            <p class="auth-subtitle">Join SmartStudio AI today</p>
+
+            <form id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <label for="username">Full Name</label>
+                    <input type="text" id="username" placeholder="John Doe" required minlength="2">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="you@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required minlength="6">
+                    <span class="tip-text" style="font-size: 0.75rem; opacity: 0.6; display: block; margin-top: 4px;">At least 1 uppercase, 1 lowercase, 1 number, and 1 special symbol.</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" placeholder="••••••••" required>
+                </div>
+
+                <div id="registerError" class="auth-error" style="display:none;"></div>
+
+                <button type="submit" class="generate-btn auth-btn" id="registerBtn">
+                    <span class="btn-text">Create Account</span>
+                    <span class="btn-loader" style="display:none;">
+                        <span class="spinner"></span> Creating...
+                    </span>
+                </button>
+            </form>
+
+            <p class="auth-link">
+                Already have an account? <a href="/login">Sign in</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // ── Splash Screen Timer (First Visit Only) ──
+        document.addEventListener('DOMContentLoaded', () => {
+            const splash = document.getElementById('splash-screen');
+            if (sessionStorage.getItem('hasSeenSplash')) {
+                if (splash) splash.remove(); // Skip instantly Node
+                return;
+            }
+
+            setTimeout(() => {
+                if (splash) {
+                    splash.classList.add('fade-out');
+                    setTimeout(() => splash.remove(), 800);
+                }
+                sessionStorage.setItem('hasSeenSplash', 'true');
+            }, 3000); // 3 Seconds
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btn = document.getElementById('registerBtn');
+            const errorDiv = document.getElementById('registerError');
+            const btnText = btn.querySelector('.btn-text');
+            const btnLoader = btn.querySelector('.btn-loader');
+
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Password complexity validation
+            const hasUpper = /[A-Z]/.test(password);
+            const hasLower = /[a-z]/.test(password);
+            const hasNumber = /\d/.test(password);
+            const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(password);
+
+            if (!hasUpper || !hasLower || !hasNumber || !hasSpecial) {
+                errorDiv.textContent = 'Password must meet complexity requirements: 1 uppercase, 1 lowercase, 1 number, and 1 special symbol.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                errorDiv.textContent = 'Passwords do not match';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            errorDiv.style.display = 'none';
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'inline-flex';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value,
+                        email: document.getElementById('email').value,
+                        password: password,
+                        confirm_password: confirmPassword
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    window.location.href = '/';
+                } else {
+                    errorDiv.textContent = data.error || 'Registration failed';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+
+            btnText.style.display = 'inline';
+            btnLoader.style.display = 'none';
+            btn.disabled = false;
+        });
+    </script>
+</body>
+
+</html>
