@@ -798,6 +798,14 @@ body {
     margin-bottom: 20px;
 }
 
+.result-actions-row {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
 .action-btn {
     flex: 1;
     padding: 14px;
@@ -1295,14 +1303,26 @@ body {
 
 @media (max-width: 600px) {
     .user-nav {
-        padding: 10px 14px;
-        flex-wrap: wrap;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+    }
+
+    .nav-brand {
+        font-size: 24px;
+    }
+
+    .nav-center {
         gap: 8px;
     }
 
     .nav-right {
+        justify-content: center;
+        width: 100%;
         flex-wrap: wrap;
-        gap: 6px;
+        gap: 8px;
     }
 
     .nav-btn {
@@ -1317,4 +1337,14 @@ body {
     .auth-logo h1 {
         font-size: 26px;
     }
-}
+
+    /* Stack elements vertically for mobile download/actions area */
+    .result-actions-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .result-actions-row .input-group {
+        width: 100%;
+    }
+}

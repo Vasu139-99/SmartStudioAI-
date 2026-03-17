@@ -288,9 +288,9 @@ def create_project(project_id, product_name, image_paths, user_id=None, language
     cursor = conn.cursor()
 
     cursor.execute("""
-    INSERT INTO projects (id, user_id, product_name, image_paths, language, aspect_ratio, status, current_step)
-    VALUES (%s, %s, %s, %s, %s, %s, 'processing', 'Uploading images')
-    """, (project_id, user_id, product_name, json.dumps(image_paths), language, aspect_ratio))
+    INSERT INTO projects (id, user_id, product_name, language, aspect_ratio, status, current_step)
+    VALUES (%s, %s, %s, %s, %s, 'processing', 'Uploading images')
+    """, (project_id, user_id, product_name, language, aspect_ratio))
 
     conn.commit()
     cursor.close()
@@ -304,6 +304,9 @@ def update_project(project_id, **kwargs):
     fields = []
     values = []
     for key, val in kwargs.items():
+        # Do not save heavy file paths into the database to save storage Node
+        if key in ['image_paths', 'video_path', 'download_path', 'voice_path', 'vtt_paths']:
+            continue
         fields.append(f"{key} = %s")
         values.append(val)
 
