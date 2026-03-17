@@ -1,4 +1,5 @@
 import pymysql
+import certifi
 import os
 import json
 import shutil
@@ -9,6 +10,8 @@ from pymysql.cursors import DictCursor
 
 
 def get_connection():
+    ssl_config = {'ca': certifi.where()} if settings.MYSQL_SSL else None
+    
     return pymysql.connect(
         host=settings.MYSQL_HOST,
         user=settings.MYSQL_USER,
@@ -17,7 +20,8 @@ def get_connection():
         port=settings.MYSQL_PORT,
         charset='utf8mb4',
         cursorclass=DictCursor,
-        autocommit=True
+        autocommit=True,
+        ssl=ssl_config
     )
 
 
@@ -77,6 +81,15 @@ def init_db():
         token VARCHAR(100) PRIMARY KEY,
         expires_at TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+    """)
+
+    # Password resets table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS password_resets (
+        email VARCHAR(255) PRIMARY KEY,
+        otp VARCHAR(6) NOT NULL,
+        expires_at TIMESTAMP NOT NULL
     )
     """)
 
@@ -280,6 +293,59 @@ def create_user_direct(username, email, password_hash):
 
 
 # ═══════════════════════════════
+# PASSWORD RESET HELPERS
+# ═══════════════════════════════
+
+def create_password_reset(email, otp, expires_at):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "REPLACE INTO password_resets (email, otp, expires_at) VALUES (%s, %s, %s)",
+            (email, otp, expires_at)
+        )
+        cursor.close()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"Error creating reset: {e}")
+        cursor.close()
+        conn.close()
+        return False
+
+def get_password_reset(email):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM password_resets WHERE email = %s", (email,))
+    row = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return dict(row) if row else None
+
+def delete_password_reset(email):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM password_resets WHERE email = %s", (email,))
+    cursor.close()
+    conn.close()
+    return True
+
+def update_password(email, password_hash):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE users SET password_hash = %s WHERE email = %s", (password_hash, email))
+        cursor.close()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"Error updating password: {e}")
+        cursor.close()
+        conn.close()
+        return False
+
+
+# ═══════════════════════════════
 # PROJECT CRUD
 # ═══════════════════════════════
 
@@ -288,9 +354,9 @@ def create_project(project_id, product_name, image_paths, user_id=None, language
     cursor = conn.cursor()
 
     cursor.execute("""
-    INSERT INTO projects (id, user_id, product_name, language, aspect_ratio, status, current_step)
-    VALUES (%s, %s, %s, %s, %s, 'processing', 'Uploading images')
-    """, (project_id, user_id, product_name, language, aspect_ratio))
+    INSERT INTO projects (id, user_id, product_name, image_paths, language, aspect_ratio, status, current_step)
+    VALUES (%s, %s, %s, %s, %s, %s, 'processing', 'Uploading images')
+    """, (project_id, user_id, product_name, json.dumps(image_paths), language, aspect_ratio))
 
     conn.commit()
     cursor.close()
@@ -304,9 +370,6 @@ def update_project(project_id, **kwargs):
     fields = []
     values = []
     for key, val in kwargs.items():
-        # Do not save heavy file paths into the database to save storage Node
-        if key in ['image_paths', 'video_path', 'download_path', 'voice_path', 'vtt_paths']:
-            continue
         fields.append(f"{key} = %s")
         values.append(val)
 

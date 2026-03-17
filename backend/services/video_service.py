@@ -1,3 +1,4 @@
+import os
 from PIL import Image as _PILImage
 if not hasattr(_PILImage, 'ANTIALIAS'):
     _PILImage.ANTIALIAS = _PILImage.LANCZOS
@@ -20,8 +21,12 @@ def merge_video_clips(clip_paths, output_path):
     clips = []
     try:
         for path in clip_paths:
-            clip = VideoFileClip(path)
-            clips.append(clip)
+            try:
+                clip = VideoFileClip(path)
+                clips.append(clip)
+            except Exception as e:
+                print(f"  [Video] ❌ Failed to load or process clip {os.path.basename(path)}: {e}")
+                raise e
 
         if not clips:
             print("No clips to merge")

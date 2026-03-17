@@ -218,10 +218,16 @@ def generate_video_from_image(image_path, prompt, output_path, width=432, height
                     video_url = data_obj["video_url"]
 
                 if video_url:
-                    video_data = requests.get(video_url, timeout=120).content
+                    print(f"  [DeAPI] Downloading video from {video_url[:60]}...")
+                    resp = requests.get(video_url, timeout=120)
+                    
+                    if "application/json" in resp.headers.get("Content-Type", "") or resp.content.startswith(b"{"):
+                        print(f"  [DeAPI] ❌ Error response instead of video: {resp.text[:200]}")
+                        return None
+                        
                     with open(output_path, "wb") as f:
-                        f.write(video_data)
-                    print(f"  [DeAPI] ✅ Saved: {output_path} ({len(video_data)} bytes)")
+                        f.write(resp.content)
+                    print(f"  [DeAPI] ✅ Saved: {output_path} ({len(resp.content)} bytes)")
                     return output_path
                 else:
                     print(f"  [DeAPI] No URL in: {json.dumps(status_data)[:300]}")

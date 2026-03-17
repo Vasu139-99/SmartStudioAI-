@@ -798,14 +798,6 @@ body {
     margin-bottom: 20px;
 }
 
-.result-actions-row {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-}
-
 .action-btn {
     flex: 1;
     padding: 14px;
@@ -1306,28 +1298,29 @@ body {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 15px;
-        padding: 15px;
+        padding: 15px 14px;
+        gap: 12px;
+        position: static; /* Allow page content to scroll naturally without fixed nav overlapping too much on short screens */
     }
 
-    .nav-brand {
-        font-size: 24px;
+    .nav-left {
+        justify-content: center;
+        width: 100%;
     }
 
     .nav-center {
-        gap: 8px;
+        width: 100%;
+    }
+
+    .nav-brand {
+        font-size: 26px;
     }
 
     .nav-right {
-        justify-content: center;
         width: 100%;
+        justify-content: center;
         flex-wrap: wrap;
         gap: 8px;
-    }
-
-    .nav-btn {
-        padding: 6px 10px;
-        font-size: 12px;
     }
 
     .auth-card {
@@ -1337,14 +1330,4 @@ body {
     .auth-logo h1 {
         font-size: 26px;
     }
-
-    /* Stack elements vertically for mobile download/actions area */
-    .result-actions-row {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .result-actions-row .input-group {
-        width: 100%;
-    }
-}
+}

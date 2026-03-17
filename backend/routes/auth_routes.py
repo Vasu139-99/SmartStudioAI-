@@ -188,3 +188,95 @@ def verify_page():
     delete_pending_user(token)
     
     return render_template("verify.html", success=True)
+
+
+# ═══════════════════════════════
+# FORGOT PASSWORD ROUTES
+# ═══════════════════════════════
+
+import random
+from datetime import datetime, timedelta
+from werkzeug.security import generate_password_hash
+from database.db import create_password_reset, get_password_reset, delete_password_reset, update_password, get_user_by_email
+from services.email_service import send_otp_email
+
+@auth_bp.route('/forgot-password', methods=['GET'])
+def forgot_password_page():
+    return render_template("forgot_password.html")
+
+@auth_bp.route('/api/forgot-password/request', methods=['POST'])
+def request_otp():
+    data = request.get_json()
+    email = data.get("email", "").strip().lower()
+
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+
+    user = get_user_by_email(email)
+    if not user:
+        return jsonify({"error": "User with this email does not exist"}), 404
+
+    # Generate 6-digit OTP
+    otp = str(random.randint(100000, 999999))
+    expires_at = datetime.now() + timedelta(minutes=15)
+
+    if create_password_reset(email, otp, expires_at):
+        if send_otp_email(email, otp):
+            return jsonify({"message": "OTP sent to your email. Valid for 15 minutes."})
+        else:
+            return jsonify({"error": "Failed to send email. Please try again."}), 500
+    else:
+        return jsonify({"error": "Failed to generate OTP. Please try again."}), 500
+
+@auth_bp.route('/api/forgot-password/reset', methods=['POST'])
+def reset_password():
+    data = request.get_json()
+    email = data.get("email", "").strip().lower()
+    otp = data.get("otp", "").strip()
+    new_password = data.get("password", "")
+    confirm = data.get("confirm_password", "")
+
+    if not email or not otp or not new_password:
+        return jsonify({"error": "All fields are required"}), 400
+
+    if new_password != confirm:
+        return jsonify({"error": "Passwords do not match"}), 400
+
+    # Password validation
+    if len(new_password) < 6:
+        return jsonify({"error": "Password must be at least 6 characters"}), 400
+    if not any(c.isupper() for c in new_password):
+        return jsonify({"error": "Password must contain at least one uppercase letter"}), 400
+    if not any(c.islower() for c in new_password):
+        return jsonify({"error": "Password must contain at least one lowercase letter"}), 400
+    if not any(c.isdigit() for c in new_password):
+        return jsonify({"error": "Password must contain at least one number"}), 400
+    
+    special_chars = "!@#$%^&*()_+-=[]{}|;:,.<>/?`~"
+    if not any(c in special_chars for c in new_password):
+        return jsonify({"error": "Password must contain at least one special character"}), 400
+
+    reset_info = get_password_reset(email)
+    if not reset_info:
+        return jsonify({"error": "No OTP request found for this email."}), 400
+
+    if reset_info["otp"] != otp:
+        return jsonify({"error": "Invalid OTP code"}), 400
+
+    # Support datetime object comparison
+    current_time = datetime.now()
+    expires_at = reset_info["expires_at"]
+    # Depending on DB retrieval, expires_at might be a string or datetime
+    if isinstance(expires_at, str):
+         expires_at = datetime.strptime(expires_at, '%Y-%m-%d %H:%M:%S')
+
+    if expires_at < current_time:
+        return jsonify({"error": "OTP code has expired"}), 400
+
+    # Update password
+    password_hash = generate_password_hash(new_password)
+    if update_password(email, password_hash):
+        delete_password_reset(email)
+        return jsonify({"message": "Password updated successfully! You can now login."})
+    else:
+        return jsonify({"error": "Update failed. Please try again."}), 500

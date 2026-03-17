@@ -24,6 +24,7 @@ class Settings:
     MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "")
     MYSQL_DB = os.getenv("MYSQL_DB", "smartstudio_db")
     MYSQL_PORT = int(os.getenv("MYSQL_PORT", 3306))
+    MYSQL_SSL = os.getenv("MYSQL_SSL", "false").lower() == "true"
     
     # Email config
     EMAIL_USER = os.getenv("EMAIL_USER", "")

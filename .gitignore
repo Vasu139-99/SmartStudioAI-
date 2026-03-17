@@ -1,35 +1,30 @@
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-.pytest_cache/
-
 # Environments
 .env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
-# Flask
-instance/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
 
-# VS Code
-.vscode/
+# Jupyter Notebook
+.ipynb_checkpoints
 
-# Project Specific
-backend/temp/*
-!backend/temp/.gitkeep
+# Static & Temp Paths
 backend/static/uploads/*
-!backend/static/uploads/.gitkeep
 backend/static/output/*
+backend/temp/*
+!backend/static/uploads/.gitkeep
 !backend/static/output/.gitkeep
+!backend/temp/.gitkeep
+
+# OS generated files
+.DS_Store
+Thumbs.db
+.vscode/
