@@ -53,8 +53,10 @@ Render is excellent for hosting Flask apps. Follow these steps:
 3.  **Configure Web Service**:
     -   **Name**: `smartstudio-ai` (or any URL name you like)
     -   **Runtime**: `Python`
-    -   **Build Command**: `pip install -r backend/requirements.txt`
-    -   **Start Command**: `gunicorn backend.app:app`
+    -   **Branch**: `main`
+    -   **Root Directory**: **`backend`**  *(💡 This is required so Render runs from the right folder!)*
+    -   **Build Command**: **`pip install -r requirements.txt`**
+    -   **Start Command**: **`gunicorn app:app`**
 
 4.  **Add Environment Variables (CRITICAL)**:
     -   Scroll down to **Advanced** -> **Environment Variables**.
@@ -67,6 +69,36 @@ Render is excellent for hosting Flask apps. Follow these steps:
 5.  **Deploy**:
     -   Click **Create Web Service**.
     -   Render will build your app and deploy it!
+
+---
+
+## ⚠️ Common Errors & Fixes
+
+### 🔴 Error: `ModuleNotFoundError: No module named 'pyaudioop'`
+This happens because Render tries to use **Python 3.13+**, which removed a core audio module that `pydub` needs.
+
+**✅ The Fix**:
+1.  Go to your Render Web Service **Settings**.
+2.  Scroll to **Environment Variables** (or click the tab).
+3.  Click **Add Environment Variable**:
+    *   **Key**: `PYTHON_VERSION`
+    *   **Value**: `3.11.8`
+4.  Save and click **Manual Deploy ➜ Clear Build Cache & Deploy**.
+
+---
+
+### 🔴 Error: `Network error. Please try again.` on Registration
+This happens when the **Database Connection fails** on the Render server. 
+
+**✅ The Cause**:
+Your `.env` file likely has `MYSQL_HOST=localhost`. 
+Render containers run in isolated environments and **cannot connect to `localhost` for MySQL** (unless running a local file like SQLite). You must use a **Hosted MySQL Database** (e.g., Clever Cloud, PlanetScale, or Render Managed DB) and provide its full remote hostname.
+
+**✅ The Fix**:
+1. Get a hosted MySQL instance and its Connection String.
+2. Go to your Render Web Service **Settings** -> **Environment Variables**.
+3. Update `MYSQL_HOST` to your **Hosted Database Domain/IP** (not `localhost`).
+4. Update `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DB` to match.
 
 ---
 

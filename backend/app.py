@@ -49,13 +49,15 @@ def favicon():
     return "", 204
 
 
-if __name__ == "__main__":
-    # Initialize directories
+# Initialize directories
+try:
     settings.init_dirs()
-
-    # Initialize database
     init_db()
+except Exception as e:
+    print(f"\n⚠️ Warning: Database/Directory initialization failed: {e}")
 
+
+if __name__ == "__main__":
     print("\n🚀 SmartStudio AI starting...")
     print("📂 Uploads:", settings.UPLOAD_FOLDER)
     print("📂 Output:", settings.OUTPUT_FOLDER)

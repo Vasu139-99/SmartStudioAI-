@@ -12,3 +12,4 @@ imageio-ffmpeg
 deep-translator
 pymysql
 gunicorn
+mysql-connector-python
