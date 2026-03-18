@@ -69,17 +69,20 @@ def register():
     expires_at = datetime.now() + timedelta(hours=24)
     password_hash = generate_password_hash(password)
     
-    # Save to pending_users
-    success = create_pending_user(username, email, password_hash, token, expires_at)
-    if not success:
+    # Save user directly to skip email lock on Render
+    from database.db import create_user_direct
+    user_id = create_user_direct(username, email, password_hash)
+    if not user_id:
          return jsonify({"error": "Registration failed, please try again"}), 500
 
-    # Send email
-    send_verification_email(email, token)
-    # ---------------------------
+    # Try sending email as fallback (will fail gracefully with timeout)
+    try:
+        send_verification_email(email, token)
+    except Exception:
+        pass
 
     return jsonify({
-        "message": "Account created! Please check your email to verify and activate your dashboard.",
+        "message": "Account created and activated! (Email verification bypassed for testing)",
         "user": {"username": username, "email": email}
     }), 201
 

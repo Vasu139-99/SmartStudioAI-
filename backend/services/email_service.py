@@ -44,7 +44,7 @@ def send_verification_email(to_email, token):
     msg['To'] = to_email
 
     try:
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as server:
             server.login(settings.EMAIL_USER, settings.EMAIL_PASSWORD)
             server.send_message(msg)
         print(f"✅ Verification email sent to {to_email}")
@@ -80,7 +80,7 @@ def send_otp_email(to_email, otp):
     msg['To'] = to_email
 
     try:
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as server:
             server.login(settings.EMAIL_USER, settings.EMAIL_PASSWORD)
             server.send_message(msg)
         print(f"✅ OTP email sent to {to_email}")
