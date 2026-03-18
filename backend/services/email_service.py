@@ -1,9 +1,10 @@
-import requests
+import smtplib
+from email.mime.text import MIMEText
 from config.settings import settings
 
 def send_verification_email(to_email, token):
-    if not settings.BREVO_API_KEY or not settings.EMAIL_USER:
-        print("❌ Email verification skipped: BREVO_API_KEY or EMAIL_USER not set")
+    if not settings.EMAIL_USER or not settings.EMAIL_PASSWORD:
+        print("❌ Email verification skipped: EMAIL_USER or EMAIL_PASSWORD not set")
         return False
 
     verification_link = f"{settings.BASE_URL}/verify?token={token}"
@@ -25,33 +26,26 @@ def send_verification_email(to_email, token):
     </html>
     """
 
-    url = "https://api.brevo.com/v3/smtp/email"
-    headers = {
-        "api-key": settings.BREVO_API_KEY,
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "sender": {"email": settings.EMAIL_USER, "name": "SmartStudio AI"},
-        "to": [{"email": to_email}],
-        "subject": "Verify your SmartStudio AI Account",
-        "htmlContent": html_content
-    }
+    msg = MIMEText(html_content, 'html')
+    msg['Subject'] = 'Verify your SmartStudio AI Account'
+    msg['From'] = settings.EMAIL_USER
+    msg['To'] = to_email
 
     try:
-        response = requests.post(url, headers=headers, json=payload, timeout=10)
-        if response.status_code in [200, 201, 202]:
-            print(f"✅ Verification email sent to {to_email}")
-            return True
-        else:
-            print(f"❌ Error sending email: {response.status_code} - {response.text}")
-            return False
+        server = smtplib.SMTP("smtp.gmail.com", 587, timeout=10)
+        server.starttls()
+        server.login(settings.EMAIL_USER, settings.EMAIL_PASSWORD)
+        server.send_message(msg)
+        server.quit()
+        print(f"✅ Verification email sent to {to_email}")
+        return True
     except Exception as e:
-        print(f"❌ Exception sending email: {e}")
+        print(f"❌ Exception sending verification email: {e}")
         return False
 
 def send_otp_email(to_email, otp):
-    if not settings.BREVO_API_KEY or not settings.EMAIL_USER:
-        print("❌ Email OTP skipped: BREVO_API_KEY or EMAIL_USER not set")
+    if not settings.EMAIL_USER or not settings.EMAIL_PASSWORD:
+        print("❌ Email OTP skipped: EMAIL_USER or EMAIL_PASSWORD not set")
         return False
 
     html_content = f"""
@@ -70,26 +64,20 @@ def send_otp_email(to_email, otp):
     </html>
     """
 
-    url = "https://api.brevo.com/v3/smtp/email"
-    headers = {
-        "api-key": settings.BREVO_API_KEY,
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "sender": {"email": settings.EMAIL_USER, "name": "SmartStudio AI"},
-        "to": [{"email": to_email}],
-        "subject": "Your SmartStudio AI Password Reset Code",
-        "htmlContent": html_content
-    }
+    msg = MIMEText(html_content, 'html')
+    msg['Subject'] = 'Your SmartStudio AI Password Reset Code'
+    msg['From'] = settings.EMAIL_USER
+    msg['To'] = to_email
 
     try:
-        response = requests.post(url, headers=headers, json=payload, timeout=10)
-        if response.status_code in [200, 201, 202]:
-            print(f"✅ OTP email sent to {to_email}")
-            return True
-        else:
-            print(f"❌ Error sending OTP email: {response.status_code} - {response.text}")
-            return False
+        server = smtplib.SMTP("smtp.gmail.com", 587, timeout=10)
+        server.starttls()
+        server.login(settings.EMAIL_USER, settings.EMAIL_PASSWORD)
+        server.send_message(msg)
+        server.quit()
+        print(f"✅ OTP email sent to {to_email}")
+        return True
     except Exception as e:
         print(f"❌ Exception sending OTP email: {e}")
         return False
+
