@@ -13,7 +13,13 @@ app = Flask(
 )
 
 # Secret key for sessions
-app.secret_key = "smartstudio_ai_secret_key_2026_change_in_production"
+app.secret_key = os.getenv("SECRET_KEY", "smartstudio_ai_secret_key_2026_change_in_production")
+
+# Secure cookies in production (HTTPS)
+if not app.debug:
+    app.config["SESSION_COOKIE_SECURE"] = True
+    app.config["SESSION_COOKIE_HTTPONLY"] = True
+
 
 # Allow large uploads (100MB)
 app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024

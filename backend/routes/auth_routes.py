@@ -9,7 +9,17 @@ from functools import wraps
 auth_bp = Blueprint("auth_bp", __name__)
 
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "user_id" not in session:
+            return jsonify({"error": "Please login first"}), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 def admin_required(f):
+
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get("is_admin"):
@@ -69,22 +79,20 @@ def register():
     expires_at = datetime.now() + timedelta(hours=24)
     password_hash = generate_password_hash(password)
     
-    # Save user directly to skip email lock on Render
-    from database.db import create_user_direct
-    user_id = create_user_direct(username, email, password_hash)
-    if not user_id:
-         return jsonify({"error": "Registration failed, please try again"}), 500
+    # Save to pending list for email verification
+    from database.db import create_pending_user
+    if create_pending_user(username, email, password_hash, token, expires_at):
+        if send_verification_email(email, token):
+            return jsonify({
+                "message": "Verification email sent! Please check your inbox and verify to activate your account.",
+                "user": {"username": username, "email": email}
+            }), 201
+        else:
+            # Clean up pending if email fails? Customarily left to expire.
+            return jsonify({"error": "Failed to send verification email. Please try again."}), 500
+    else:
+        return jsonify({"error": "Registration failed, email might be registered or system error"}), 500
 
-    # Try sending email as fallback (will fail gracefully with timeout)
-    try:
-        send_verification_email(email, token)
-    except Exception:
-        pass
-
-    return jsonify({
-        "message": "Account created and activated! (Email verification bypassed for testing)",
-        "user": {"username": username, "email": email}
-    }), 201
 
 
 @auth_bp.route('/api/login', methods=['POST'])

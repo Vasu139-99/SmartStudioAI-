@@ -12,6 +12,8 @@ class Settings:
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
     ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
     VOICE_ID = os.getenv("VOICE_ID", "FGY2WhTYpPnrIDTdsKH5")
+    BASE_URL = os.getenv("BASE_URL", "http://localhost:5000")
+
 
     # DeAPI: supports multiple comma-separated keys for rotation
     _deapi_env = os.getenv("DEAPI_KEY", "")

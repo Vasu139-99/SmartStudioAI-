@@ -13,8 +13,10 @@ from services.elevenlabs_service import generate_voice
 from services.video_service import merge_video_clips, add_audio_to_video, get_video_duration
 from services.caption_service import generate_vtt_captions, add_captions_to_video
 import shutil
+from routes.auth_routes import login_required
 
 project_bp = Blueprint("project_bp", __name__)
+
 
 
 def run_pipeline(project_id, product_name, image_paths, language="English", custom_script=None, caption_color="#ffff00", width=432, height=768, aspect_ratio='9:16'):
@@ -186,11 +188,11 @@ def run_pipeline(project_id, product_name, image_paths, language="English", cust
 # ============================================
 
 @project_bp.route('/api/generate', methods=['POST'])
+@login_required
 def generate_video():
     try:
         user_id = session.get("user_id")
-        if not user_id:
-            return jsonify({"error": "Please login first"}), 401
+
 
         product_name = request.form.get("product_name", "Product")
         language = request.form.get("language", "English")
@@ -246,11 +248,17 @@ def generate_video():
 # ============================================
 
 @project_bp.route('/api/project/<project_id>', methods=['GET'])
+@login_required
 def check_status(project_id):
     project = get_project(project_id)
 
     if not project:
         return jsonify({"error": "Project not found"}), 404
+
+    # Ownership check
+    if project.get("user_id") != session.get("user_id"):
+        return jsonify({"error": "Unauthorized"}), 403
+
 
     return jsonify({
         "id": project["id"],
@@ -270,10 +278,10 @@ def check_status(project_id):
 # ============================================
 
 @project_bp.route('/api/project/<project_id>/burn_captions', methods=['POST'])
+@login_required
 def burn_specific_captions(project_id):
     user_id = session.get("user_id")
-    if not user_id:
-        return jsonify({"error": "Please login first"}), 401
+
         
     project = get_project(project_id)
     if not project:
@@ -332,10 +340,10 @@ def burn_specific_captions(project_id):
 # ============================================
 
 @project_bp.route('/api/project/<project_id>/remix', methods=['POST'])
+@login_required
 def remix_project(project_id):
     user_id = session.get("user_id")
-    if not user_id:
-        return jsonify({"error": "Please login first"}), 401
+
     
     project = get_project(project_id)
     if not project:
@@ -483,7 +491,9 @@ def remix_project(project_id):
 # ============================================
 
 @project_bp.route('/api/projects', methods=['GET'])
+@login_required
 def list_projects():
+
     user_id = session.get("user_id")
     projects = get_all_projects(user_id=user_id)
 
@@ -505,10 +515,10 @@ def list_projects():
 # ============================================
 
 @project_bp.route('/api/project/<project_id>', methods=['DELETE'])
+@login_required
 def remove_project(project_id):
     user_id = session.get("user_id")
-    if not user_id:
-        return jsonify({"error": "Please login first"}), 401
+
 
     project = get_project(project_id)
     if not project:

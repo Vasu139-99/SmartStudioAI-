@@ -3,23 +3,13 @@ import socket
 from email.mime.text import MIMEText
 from config.settings import settings
 
-def _get_local_ip():
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80)) # connection isn't actually opened
-        ip = s.getsockname()[0]
-        s.close()
-        return ip
-    except Exception:
-        return "127.0.0.1"
-
 def send_verification_email(to_email, token):
     if not settings.EMAIL_USER or not settings.EMAIL_PASSWORD:
         print("❌ Email verification skipped: EMAIL_USER/PASSWORD not set in .env")
         return False
 
-    local_ip = _get_local_ip()
-    verification_link = f"http://{local_ip}:5000/verify?token={token}"
+    verification_link = f"{settings.BASE_URL}/verify?token={token}"
+
     
     html_content = f"""
     <html>
