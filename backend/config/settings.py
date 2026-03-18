@@ -13,6 +13,8 @@ class Settings:
     ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
     VOICE_ID = os.getenv("VOICE_ID", "FGY2WhTYpPnrIDTdsKH5")
     BASE_URL = os.getenv("BASE_URL", "http://localhost:5000")
+    BREVO_API_KEY = os.getenv("BREVO_API_KEY", "")
+
 
 
     # DeAPI: supports multiple comma-separated keys for rotation
