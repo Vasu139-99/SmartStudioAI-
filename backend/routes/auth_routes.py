@@ -187,8 +187,19 @@ def verify_page():
          return render_template("verify.html", error="Invalid or expired verification token.")
          
     # Check if expired
-    if "expires_at" in pending and pending["expires_at"] < datetime.now():
-         return render_template("verify.html", error="Verification token has expired.")
+    expires_at = pending.get("expires_at")
+    if expires_at:
+         # Depending on DB retrieval, expires_at might be a string or datetime
+         if isinstance(expires_at, str):
+              try:
+                   from datetime import datetime
+                   expires_at = datetime.strptime(expires_at, '%Y-%m-%d %H:%M:%S')
+              except ValueError:
+                   pass # Fallback
+         from datetime import datetime
+         if isinstance(expires_at, datetime) and expires_at < datetime.now():
+              return render_template("verify.html", error="Verification token has expired.")
+
     
     # Move to main users table
     user_id = create_user_direct(pending["username"], pending["email"], pending["password_hash"])
