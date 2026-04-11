@@ -8,9 +8,10 @@
     <meta name="description" content="Upload 4 images and let AI create a stunning 3D cinematic video with voiceover">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css?v=2">
 </head>
 
 <body>
@@ -35,7 +36,9 @@
         </a>
         <div class="nav-right">
             {% if session.get("is_admin") %}
-            <a href="/admin" class="nav-btn admin-btn" style="background: rgba(108, 92, 231, 0.2); color: #a29bfe; border: 1px solid rgba(108, 92, 231, 0.4); text-decoration: none; display: flex; align-items: center; justify-content: center; padding: 10px 15px; border-radius: 8px;">🛠 Admin Panel</a>
+            <a href="/admin" class="nav-btn admin-btn"
+                style="background: rgba(108, 92, 231, 0.2); color: #a29bfe; border: 1px solid rgba(108, 92, 231, 0.4); text-decoration: none; display: flex; align-items: center; justify-content: center; padding: 10px 15px; border-radius: 8px;">🛠
+                Admin Panel</a>
             {% endif %}
             <span class="nav-user" id="navUsername"><span class="user-icon">👤</span> User</span>
             <button class="nav-btn logout-btn" id="logoutBtn" title="Logout">Logout</button>
@@ -261,7 +264,8 @@
 
                     <div class="input-group" style="margin: 0;">
                         <label style="font-size: 0.85rem; margin-bottom: 5px; opacity: 0.7;">Subtitle Color:</label>
-                        <input type="color" id="captionColorResult" value="#ffff00" style="height: 38px; width: 60px; cursor: pointer; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius:10px;">
+                        <input type="color" id="captionColorResult" value="#ffff00"
+                            style="height: 38px; width: 60px; cursor: pointer; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius:10px;">
                     </div>
 
                     <a id="downloadBtn" class="action-btn download-btn" download style="margin-top: 22px;">

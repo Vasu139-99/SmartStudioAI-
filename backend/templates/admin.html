@@ -7,7 +7,8 @@
     <title>Admin Dashboard - SmartStudio AI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
     <style>
@@ -95,7 +96,8 @@
             text-align: left;
         }
 
-        th, td {
+        th,
+        td {
             padding: 15px;
             border-bottom: 1px solid var(--border);
             font-size: 0.9rem;
@@ -176,7 +178,9 @@
             </a>
         </div>
         <div class="nav-right">
-            <a href="/" class="nav-btn logout-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">← Back to App</a>
+            <a href="/" class="nav-btn logout-btn"
+                style="text-decoration: none; display: flex; align-items: center; justify-content: center;">← Back to
+                App</a>
         </div>
     </nav>
 
@@ -233,7 +237,9 @@
                         </tr>
                     </thead>
                     <tbody id="usersTableBody">
-                        <tr><td colspan="6" style="text-align:center;">Loading users...</td></tr>
+                        <tr>
+                            <td colspan="6" style="text-align:center;">Loading users...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -258,7 +264,9 @@
                         </tr>
                     </thead>
                     <tbody id="projectsTableBody">
-                        <tr><td colspan="6" style="text-align:center;">Loading projects...</td></tr>
+                        <tr>
+                            <td colspan="6" style="text-align:center;">Loading projects...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -279,7 +287,9 @@
                         </tr>
                     </thead>
                     <tbody id="pendingTableBody">
-                        <tr><td colspan="3" style="text-align:center;">Loading pending...</td></tr>
+                        <tr>
+                            <td colspan="3" style="text-align:center;">Loading pending...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -320,7 +330,7 @@
                 if (data.total_users !== undefined) {
                     document.getElementById('totalUsers').innerText = data.total_users;
                     document.getElementById('totalProjects').innerText = data.total_projects;
-                    if(document.getElementById('totalPending')) {
+                    if (document.getElementById('totalPending')) {
                         document.getElementById('totalPending').innerText = data.total_pending || 0;
                     }
                 }
@@ -356,8 +366,8 @@
         }
 
         async function loadProjects() {
-             // ... code for projects ...
-             try {
+            // ... code for projects ...
+            try {
                 const res = await fetch('/api/admin/projects');
                 const data = await res.json();
                 const tbody = document.getElementById('projectsTableBody');
